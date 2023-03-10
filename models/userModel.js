@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = mongoose.Schema({
-  userName: {
+  email: {
     type: String,
     require: true,
     unique:true
@@ -15,6 +15,19 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  maxScore: {
+    type: Number,
+    default: 0
+  },
+  lastScore: {
+    type: Number,
+    default: 0
+  },
+  wordContributed: {
+    type : Array,
+    default: []
+  }
+
 });
 
 userSchema.pre("save", async function (next) {
@@ -29,3 +42,4 @@ userSchema.pre("save", async function (next) {
 });
 
 export const userModel = mongoose.model("userSchema_wordGame", userSchema);
+ 

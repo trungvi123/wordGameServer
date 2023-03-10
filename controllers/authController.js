@@ -10,7 +10,30 @@ const generateAccessToken = (user) => {
       isAdmin: user.isAdmin,
     },
     process.env.SECRET_KEY,
-    { expiresIn: "2s" }
+    { expiresIn: "6h" }
+  );
+};
+
+const generateToken = (word) => {
+  //word
+  return jwt.sign(
+    {
+      w: word.word,
+      author: word.author,
+      authorNote: word.authorNote
+    },
+    process.env.SECRET_KEY,
+    { expiresIn: "3h" }
+  );
+};
+
+const generateCookie = () => {
+  return jwt.sign(
+    {
+      mes: "cookie for update score",
+    },
+    process.env.SECRET_KEY,
+    { expiresIn: "1h" }
   );
 };
 
@@ -26,30 +49,36 @@ const generateRefreshToken = (user) => {
 };
 
 const signUp = async (req, res) => {
-  const { userName, password, comfirmPassword } = req.body;
-  let already = await userModel.findOne({ userName });
+  try {
+    const { email, password, confirmPassword } = req.body;
 
-  if (already)
-    return res
-      .status(401)
-      .json({ err: "Tai khoan da ton tai", status: "failure" });
+    let already = await userModel.findOne({ email });
 
-  if (password === comfirmPassword) {
-    const newUser = new userModel({
-      userName,
-      password,
-    });
+    if (already)
+      return res
+        .status(401)
+        .json({ err: "Tai khoan da ton tai", status: "failure" });
 
-    await newUser.save();
-    return res.status(200).json({ newUser });
+    if (password === confirmPassword) {
+      const newUser = new userModel({
+        email,
+        password,
+      });
+
+      await newUser.save();
+      return res.status(200).json({ state: "success" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
   }
 };
 
 const signIn = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await userModel.findOne({ userName });
+    const user = await userModel.findOne({ email });
     if (!user)
       return res
         .status(401)
@@ -71,13 +100,15 @@ const signIn = async (req, res) => {
     });
 
     return res.status(200).json({
-      userName,
-      id: user._id,
+      email,
+      _id: user._id,
       accessToken,
+      ms: user.maxScore,
       state: "success",
     });
   } catch (error) {
     console.log(error);
+    return res.status(500);
   }
 };
 
@@ -101,4 +132,19 @@ const refreshTokeMethod = async (req, res) => {
   });
 };
 
-export { signIn, signUp, refreshTokeMethod };
+const getCookie = async (req, res) => {
+  try {
+    const cookie = generateCookie();
+    res.cookie("ups", cookie, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
+    return res.status(200).json({ state: "success" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { signIn, signUp, refreshTokeMethod, getCookie, generateToken };
