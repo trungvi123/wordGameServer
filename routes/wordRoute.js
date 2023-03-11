@@ -16,7 +16,7 @@ import {
 const router = express.Router();
 
 router.get("/", checkAccessToken, getAllKey);
-router.get("/getWord", checkAccessToken, getWord);
+router.get("/getWord", getWord);
 router.get("/getAllPendingWord", checkAdminAccessToken, getAllPendingWord);
 router.get("/getTopUsers",checkAccessToken, getTopUsers);
 
