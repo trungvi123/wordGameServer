@@ -94,9 +94,9 @@ const signIn = async (req, res) => {
     const refreshToken = generateRefreshToken(user);
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: "/",
-      sameSite: "strict",
+      sameSite: "none",
     });
 
     return res.status(200).json({
@@ -137,9 +137,9 @@ const getCookie = async (req, res) => {
     const cookie = generateCookie();
     res.cookie("ups", cookie, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: "/",
-      sameSite: "strict",
+      sameSite: "none",
     });
     return res.status(200).json({ state: "success" });
   } catch (error) {
