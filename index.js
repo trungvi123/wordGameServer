@@ -16,7 +16,8 @@ env.config()
 
 // app.use(cors());
 const corsOrigin ={
-  origin:'https://englishgamehehe.web.app', //or whatever port your frontend is using
+  // origin:'http://localhost:3000',
+  // origin:'https://englishgamehehe.web.app' , //or whatever port your frontend is using
   credentials:true,        
 }
 app.use(cors(corsOrigin));
