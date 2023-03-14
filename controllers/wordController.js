@@ -11,7 +11,7 @@ const getAllKey = async (req, res) => {
 const getWord = async (req, res) => {
   const allWord = await wordModel.find();
   const indexWord = Math.floor(Math.random() * allWord.length);
-
+  if(!allWord[indexWord]) return res.status(400).json({ state: "failure" });
   let wtoken = generateToken(allWord[indexWord]);
   wtoken = "SizurTePdhkzvE" + wtoken + "fghjaWawPznD";
 
@@ -49,7 +49,7 @@ const testWord = async (req, res) => {
 };
 
 const getAllPendingWord = async (req, res) => {
-  const result = await pendingWordModel.find();
+  const data = await pendingWordModel.find();
 
   return res.status(200).json({ state: "success", data });
 };
@@ -96,7 +96,10 @@ const createWord = async (req, res) => {
     await userModel.findOneAndUpdate(
       { email: author },
       {
-        wordContributed: [...user.wordContributed, word],
+        wordContributed: [...user.wordContributed, {
+          word,
+          authorNote
+        }],
       },
       {
         new: true,

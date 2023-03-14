@@ -20,7 +20,7 @@ const generateToken = (word) => {
     {
       w: word.word,
       author: word.author,
-      authorNote: word.authorNote
+      authorNote: word.authorNote,
     },
     process.env.SECRET_KEY,
     { expiresIn: "3h" }
@@ -105,6 +105,7 @@ const signIn = async (req, res) => {
       accessToken,
       ms: user.maxScore,
       state: "success",
+      wordContributed: user.wordContributed,
     });
   } catch (error) {
     console.log(error);
@@ -132,6 +133,35 @@ const refreshTokeMethod = async (req, res) => {
   });
 };
 
+const changePassword = async (req, res) => {
+  const { email, password, newpassword } = req.body;
+
+  const user = await userModel.findOne({ email });
+  if (!user)
+    return res
+      .status(401)
+      .json({ err: "Khong tim thay user", status: "failure" });
+
+  const compare = await bcrypt.compare(password, user.password);
+  if (!compare)
+    return res
+      .status(401)
+      .json({ err: "Mat khau khong chinh xac", status: "failure" });
+
+  // tao ma hoa matkhau moi
+  const salt = bcrypt.genSaltSync(10);
+  const passwordHashed = bcrypt.hashSync(newpassword, salt);
+  const newpass = passwordHashed; // done
+  await userModel.findOneAndUpdate(
+    { email },
+    { password: newpass }
+  );
+
+  return res
+      .status(200)
+      .json({status: "success" });
+};
+
 const getCookie = async (req, res) => {
   try {
     const cookie = generateCookie();
@@ -147,4 +177,4 @@ const getCookie = async (req, res) => {
   }
 };
 
-export { signIn, signUp, refreshTokeMethod, getCookie, generateToken };
+export { signIn, signUp, refreshTokeMethod, getCookie, generateToken ,changePassword};
