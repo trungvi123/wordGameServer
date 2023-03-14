@@ -20,7 +20,7 @@ const getWord = async (req, res) => {
 
 const getTopUsers = async (req, res) => {
   try {
-    const users = await userModel.find().sort({ maxScore: -1 }).limit(10);
+    const users = await userModel.find().sort({ maxScore: -1 }).limit(5);
 
     const data = users.map((e)=>{
       return {
